@@ -878,4 +878,17 @@ class PersonService
         $model->pfm_active_status_id = isset($datas->activeStatusId) ? $datas->activeStatusId : 1;
         return $model;
     }
+    public function resendOtpForMobile($datas)
+    {
+        $datas = (object) $datas;
+        $model = $this->personInterface->getPersonMobileNoByUid($datas->uid, $datas->mobile_no);
+        if ($model) {
+            $otp = $this->sendingOtp();
+            $setOtpMobile = $this->setOtpMobileNo($datas->uid, $datas->mobile_no, $otp);
+            $data = ['Message' => ' Resend OTP Successfully', 'type' => 1];
+        } else {
+            $data = ['Message' => 'Data Not Found', 'type' => 2];
+        }
+        return $this->commonService->sendResponse($data, true);
+    }
 }

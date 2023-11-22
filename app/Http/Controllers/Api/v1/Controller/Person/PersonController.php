@@ -145,4 +145,11 @@ class PersonController extends Controller
         Log::info('PersonController > addSecondaryMobile function Return.' . json_encode($response));
         return $response;
     }
+    public function resendOtpForMobile(Request $request)
+    {
+        Log::info('PersonController > resendOtpForMobile function Inside.' . json_encode($request->all()));
+        $response = $this->personService->resendOtpForMobile($request->all());
+        Log::info('PersonController > resendOtpForMobile function Return.' . json_encode($response));
+        return $response;
+    }
 }

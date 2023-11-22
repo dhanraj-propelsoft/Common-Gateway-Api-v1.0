@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1\Services\Member;
+namespace App\Http\Controllers\Api\v1\Service\Member;
 
-use App\Http\Controllers\Api\v1\Interfaces\Member\MemberInterface;
-use App\Http\Controllers\Api\v1\Interfaces\Organization\OrganizationInterface;
-use App\Http\Controllers\Api\v1\Interfaces\Person\PersonInterface;
-use App\Http\Controllers\Api\v1\Services\Common\CommonService;
+use App\Http\Controllers\Api\v1\Interface\Member\MemberInterface;
+use App\Http\Controllers\Api\v1\Interface\Person\PersonInterface;
+use App\Http\Controllers\Api\v1\Service\Common\CommonService;
 use App\Models\Member;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -13,12 +12,11 @@ use Illuminate\Support\Facades\Validator;
 
 class MemberService
 {
-    public function __construct(MemberInterface $MemberInterface, PersonInterface $personInterface, CommonService $commonService, OrganizationInterface $OrganizationInterface)
+    public function __construct(MemberInterface $MemberInterface, PersonInterface $personInterface, CommonService $commonService)
     {
         $this->MemberInterface = $MemberInterface;
         $this->personInterface = $personInterface;
         $this->commonService = $commonService;
-        $this->OrganizationInterface = $OrganizationInterface;
     }
     public function storeMember($data)
     {
@@ -124,7 +122,9 @@ class MemberService
         }
         Log::info('MemberService > memberLogin function Inside.' . json_encode($datas));
         $datas = (object) $datas;
+
         $verifyMember = $this->MemberInterface->verifyMemberForMobile($datas);
+
         Log::info('MemberService > memberLogin function Return.' . json_encode($verifyMember));
         if ($verifyMember) {
             $uid = $verifyMember->uid;
@@ -134,10 +134,10 @@ class MemberService
             $personPic = $personDetail->PersonPic->profile_pic ?? null;
             if (Hash::check($datas->password, $verifyMember->password)) {
                 $token = $verifyMember->createToken('Laravel Password Grant Client')->accessToken;
+                dd($token);
                 $personStatus = $this->personInterface->checkPersonExistence($uid);
                 $personType = $personStatus ? $personStatus->existence : null;
-                $defaultOrg = $this->OrganizationInterface->getPerviousDefaultOrganization($uid);
-                $response = ['type' =>1, 'personType' => $personType, 'token' => $token, 'uid' => $uid, 'defaultOrg' => $defaultOrg, 'nickName' => $nickName, 'firstName' => $firstName, 'personPic' => $personPic];
+                $response = ['type' =>1, 'personType' => $personType, 'token' => $token, 'uid' => $uid,'nickName' => $nickName, 'firstName' => $firstName, 'personPic' => $personPic];
                 return $this->commonService->sendResponse($response, "Login Successfully");
             } else {
                 $response = ['type' =>2, 'firstName' => $firstName, 'uid' => $uid];
@@ -145,6 +145,7 @@ class MemberService
             }
         } else {
             $response = ["message" => 'Member does not exist'];
+
             return response($response, 422);
         }
     }

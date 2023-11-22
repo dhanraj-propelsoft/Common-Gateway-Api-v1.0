@@ -23,6 +23,7 @@ Route::post('profileUpdate',[PersonController::class,'profileUpdate'])->name('pr
 Route::post('getPersonAllDetails',[PersonController::class,'getPersonAllDetails'])->name('getPersonAllDetails');
 Route::post('memberAllDetails',[PersonController::class,'memberAllDetails'])->name('memberAllDetails');
 Route::post('addSecondaryMobile',[PersonController::class,'addSecondaryMobile'])->name('addSecondaryMobile');
+Route::post('resendOtpForMobile',[PersonController::class,'resendOtpForMobile'])->name('resendOtpForMobile');
 
 
 

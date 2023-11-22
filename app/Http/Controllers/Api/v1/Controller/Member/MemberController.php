@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\v1\Controller\Member;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Api\v1\Services\Member\MemberService;
+use App\Http\Controllers\Api\v1\Service\Member\MemberService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -128,7 +128,7 @@ class MemberController extends Controller
     }
     public function memberLogout(Request $request)
     {
-        dd($request);
+
         Log::info('MemberController > memberLogout function Inside.' . json_encode($request->all()));
         $response = $this->MemberService->memberLogout();
         Log::info('MemberController > memberLogout function Return.' . json_encode($response));

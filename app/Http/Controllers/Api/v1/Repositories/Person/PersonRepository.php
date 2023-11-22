@@ -328,4 +328,21 @@ class PersonRepository implements PersonInterface
             ];
         }
     }
+    public function getPrimaryMobileAndEmailbyUid($uid)
+    {
+     return  Person::with(['mobile', 'email'])
+        ->where('uid', $uid)
+        ->whereHas('mobile', function ($query) {
+            $query->whereIn('mobile_cachet_id', [1]);
+        })
+        ->whereHas('email', function ($query) {
+            $query->whereIn('email_cachet_id', [1]);
+        })
+        ->first();
+
+    }
+    public function getPersonPicAndPersonName($uid)
+    {
+        return personDetails::with('PersonPic')->where('uid', $uid)->first();
+    }
 }

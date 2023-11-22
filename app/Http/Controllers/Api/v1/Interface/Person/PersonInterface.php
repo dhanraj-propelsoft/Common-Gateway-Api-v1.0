@@ -36,6 +36,8 @@ interface PersonInterface
     public function addSecondaryMobileNoForMember($model);
     public function getPrimaryMobileAndEmailbyUid($uid);
     public function getPersonPicAndPersonName($uid);
+    public function checkPersonExistence($uid);
+
 
 
 

@@ -345,4 +345,8 @@ class PersonRepository implements PersonInterface
     {
         return personDetails::with('PersonPic')->where('uid', $uid)->first();
     }
+    public function checkPersonExistence($uid)
+    {
+        return person::where(['uid' => $uid, 'pfm_existence_id' => 1])->first();
+    }
 }

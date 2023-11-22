@@ -117,4 +117,32 @@ class PersonController extends Controller
         Log::info('PersonController > personProfiles function Return.' . json_encode($response));
         return $response;
     }
+    public function profileUpdate(Request $request)
+    {
+        Log::info('PersonController > profileUpdate function Inside.' . json_encode($request->all()));
+        $response = $this->personService->storePerson($request->all());
+        Log::info('PersonController > profileUpdate function Return.' . json_encode($response));
+        return $response;
+    }
+    public function getPersonAllDetails(Request $request)
+    {
+        Log::info('PersonController > getPersonAllDetails function Inside.' . json_encode($request->all()));
+        $response = $this->personService->getPersonAllDetails($request->all());
+        Log::info('PersonController > getPersonAllDetails function Return.' . json_encode($response));
+        return $response;
+    }
+    public function memberAllDetails(Request $request)
+    {
+        Log::info('PersonController > memberAllDetails function Inside.' . json_encode($request->all()));
+        $response = $this->personService->memberAllDetails($request->all());
+        Log::info('PersonController > memberAllDetails function Return.' . json_encode($response));
+        return $response;
+    }
+    public function addSecondaryMobile(Request $request)
+    {
+        Log::info('PersonController > addSecondaryMobile function Inside.' . json_encode($request->all()));
+        $response = $this->personService->addSecondaryMobile($request->all());
+        Log::info('PersonController > addSecondaryMobile function Return.' . json_encode($response));
+        return $response;
+    }
 }

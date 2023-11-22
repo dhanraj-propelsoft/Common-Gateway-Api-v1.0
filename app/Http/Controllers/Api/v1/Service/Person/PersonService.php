@@ -8,19 +8,25 @@ use App\Http\Controllers\Api\v1\Interface\Member\MemberInterface;
 use App\Http\Controllers\Api\v1\Interface\Person\PersonInterface;
 use App\Http\Controllers\Api\v1\Service\Common\CommonService;
 use App\Http\Controllers\Api\v1\Service\Common\SmsService;
+use App\Models\IdDocumentType;
 use App\Models\Person;
 use App\Models\PersonAddress;
 use App\Models\personAnniversary;
 use App\Models\PersonDetails;
+use App\Models\PersonEducation;
 use App\Models\PersonEmail;
 use App\Models\PersonLanguage;
 use App\Models\PersonMobile;
+use App\Models\PersonProfession;
 use App\Models\PersonProfilePic;
 use App\Models\PropertyAddress;
 use App\Models\TempPerson;
+use App\Models\WebLink;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class PersonService
 {
@@ -809,7 +815,67 @@ class PersonService
             'personAddressByUid' => $personAddressByUid,
             'personMasterData' => $personMasterData,
             'secondaryMobile' => $secondaryMobile,
-            'secondaryEmail'  =>$secondaryEmail
+            'secondaryEmail' => $secondaryEmail,
         ];
+    }
+    public function getPersonAllDetails($datas)
+    {
+        Log::info('PersonService > getPersonAllDetails function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $personMobile = $this->personInterface->getPersonDataByMobileNo($datas->mobileNumber);
+        $personEmail = $this->personInterface->getPersonDataByEmail($datas->email);
+        $personData = ['personMobile' => $personMobile->mobile, 'personEmail' => $personEmail->email];
+        return $this->commonService->sendResponse($personData, true);
+    }
+    public function memberAllDetails($datas)
+    {
+        Log::info('PersonService > memberAllDetails function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $member = $this->personInterface->getAllDatasInMember($datas->uid);
+        $personDetails = $member['personDetails'];
+        $primaryMobile = $member['mobile'];
+        $primaryEmail = $member['email'];
+        $profilePic = $member['profilePic'];
+        $personGender = $member['personDetails']['gender'];
+        $personbloodGroup = $member['personDetails']['bloodGroup'];
+        $primaryAddress = isset($member['personAddress']['ParentComAddress']) ? $member['personAddress']['ParentComAddress'] : '';
+        $personEducation = $member['personEducation'];
+        $personProfession = $member['personProfession'];
+
+        $data = ['memberDeatils' => $personDetails, 'primaryMobile' => $primaryMobile, 'primaryEmail' => $primaryEmail, 'profilePic' => $profilePic, 'memberGender' => $personGender, 'memberBloodGroup' => $personbloodGroup, 'primaryAddress' => $primaryAddress, 'memberEducation' => $personEducation, 'memberProfession' => $personProfession];
+
+        return $this->commonService->sendResponse($data, true);
+    }
+    public function addSecondaryMobile($datas)
+    {
+
+        $datas = (object) $datas;
+        Log::info('PersonService > addSecondaryMobile function Inside.' . json_encode($datas->mobileNo));
+        $checkPrimaryMobile = $this->personInterface->checkPersonByMobileNo($datas->mobileNo);
+
+        $checkMobile = $this->personInterface->checkSecondaryMobileNumberByUid($datas->mobileNo, $datas->personUid);
+        if (empty($checkPrimaryMobile) && empty($checkMobile)) {
+            $convertMobileNo = $this->convertSecondaryMobileNo($datas);
+            $result = $this->personInterface->addSecondaryMobileNoForMember($convertMobileNo);
+
+        } else {
+
+            $result = $checkPrimaryMobile
+            ? ['Member' => 'This Number  Exists in Member', 'type' => 2]
+            : ['Member' => 'This Number  Exists in Other Member', 'type' => 1];
+
+        }
+        return $this->commonService->sendResponse($data, true);
+    }
+    public function convertSecondaryMobileNo($datas)
+    {
+        $model = new PersonMobile();
+        $model->uid = $datas->uid;
+        $model->country_id = isset($datas->countryId) ? $datas->countryId : null;
+        $model->mobile_no = $datas->mobileNo;
+        $model->otp_received = $this->sendingOtp();
+        $model->mobile_cachet_id = isset($datas->cachetId) ? $datas->cachetId : 2;
+        $model->pfm_active_status_id = isset($datas->activeStatusId) ? $datas->activeStatusId : 1;
+        return $model;
     }
 }

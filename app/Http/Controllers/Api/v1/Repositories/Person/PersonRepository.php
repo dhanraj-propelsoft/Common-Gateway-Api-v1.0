@@ -17,7 +17,10 @@ use App\Models\TempMobile;
 use App\Models\TempPerson;
 use App\Models\Member;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class PersonRepository implements PersonInterface
 {
@@ -275,5 +278,54 @@ class PersonRepository implements PersonInterface
     public function personSecondaryEmailByUid($uid)
     {
         return PersonEmail::where(['uid' => $uid, ['email_cachet_id', '=', '2']])->get();
+    }
+    public function getPersonDataByEmail($email)
+    {
+        return Person::with('email', 'existMember')
+        ->whereHas('email', function ($query) use ($email) {
+            $query->whereIn('email_cachet_id', [1, 2])
+                ->where('email', $email);
+        })
+        ->whereHas('existMember', function ($query) use ($email) {
+            $query->where('primary_email', '!=', $email);
+        })
+        ->first();
+
+    }
+    public function getPersonDataByMobileNo($mobile)
+    {
+        return Person::with('mobile', 'existMember')
+        ->whereHas('mobile', function ($query) use ($mobile) {
+            $query->whereIn('mobile_cachet_id', [1, 2])
+                ->where('mobile_no', $mobile);
+        })
+        ->whereHas('existMember', function ($query) use ($mobile) {
+            $query->where('primary_mobile', '!=', $mobile);
+        })
+        ->first();
+
+    }
+    public function getAllDatasInMember($uid)
+    {
+        return Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personDetails.gender', 'personDetails.bloodGroup', 'personAddress', 'personAddress.ParentComAddress', 'personEducation', 'personProfession', 'personLanguage')->where('uid', $uid)->first();
+    }
+    public function addSecondaryMobileNoForMember($model)
+    {
+        try {
+            $result = DB::transaction(function () use ($model) {
+
+                $model->save();
+                return [
+                    'message' => "Success",
+                    'data' => $model,
+                ];
+            });
+            return $result;
+        } catch (\Exception $e) {
+            return [
+                'message' => "Failed",
+                'data' => $e,
+            ];
+        }
     }
 }

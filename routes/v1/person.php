@@ -19,5 +19,10 @@ Route::post('personUpdate',[PersonController::class,'personUpdate'])->name('pers
 Route::post('personToMember',[PersonController::class,'personToMember'])->name('personToMember');
 Route::post('emailOtpValidation',[PersonController::class,'emailOtpValidation'])->name('emailOtpValidation');
 Route::post('personProfiles',[PersonController::class,'personProfiles'])->name('personProfiles');
+Route::post('profileUpdate',[PersonController::class,'profileUpdate'])->name('profileUpdate');
+Route::post('getPersonAllDetails',[PersonController::class,'getPersonAllDetails'])->name('getPersonAllDetails');
+Route::post('memberAllDetails',[PersonController::class,'memberAllDetails'])->name('memberAllDetails');
+Route::post('addSecondaryMobile',[PersonController::class,'addSecondaryMobile'])->name('addSecondaryMobile');
+
 
 

@@ -37,6 +37,31 @@ interface PersonInterface
     public function getPrimaryMobileAndEmailbyUid($uid);
     public function getPersonPicAndPersonName($uid);
     public function checkPersonExistence($uid);
+    public function destroyMobileNoByUid($uid,$mobile);
+    public function getSecondaryMobileNoByUid($mobile,$uid);
+    public function setStatusForMobileNo($id,$mobile);
+    public function getPerviousPrimaryMobileNo($uid);
+    public function setPirmaryMobileNo($model);
+    public function checkPersonByEmail($email);
+    public function addSecondaryEmailForMember($model);
+    public function deletedPersonEmailByUid($email,$uid);
+    public function getSecondaryEmailByUid($email,$uid);
+    public function getPerviousPrimaryEmail($uid);
+    public function setPirmaryEmail($model);
+    public function getMobileNoByUid($mobile,$uid);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -134,7 +134,7 @@ class MemberService
             $personPic = $personDetail->PersonPic->profile_pic ?? null;
             if (Hash::check($datas->password, $verifyMember->password)) {
                 $token = $verifyMember->createToken('Laravel Password Grant Client')->accessToken;
-                dd($token);
+
                 $personStatus = $this->personInterface->checkPersonExistence($uid);
                 $personType = $personStatus ? $personStatus->existence : null;
                 $response = ['type' =>1, 'personType' => $personType, 'token' => $token, 'uid' => $uid,'nickName' => $nickName, 'firstName' => $firstName, 'personPic' => $personPic];

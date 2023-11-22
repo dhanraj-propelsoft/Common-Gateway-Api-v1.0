@@ -891,4 +891,159 @@ class PersonService
         }
         return $this->commonService->sendResponse($data, true);
     }
+    public function deleteForMobileNoByUid($datas)
+    {
+        $datas = (object) $datas;
+        Log::info('PersonService > deleteForMobileNoByUid function Inside.' . json_encode($datas));
+        $model = $this->personInterface->destroyMobileNoByUid($datas->uid, $datas->mobile_no);
+        if ($model) {
+            $result = ['Message' => 'MobileNo are Deleted', 'type' => 1];
+        } else {
+            $result = ['Message' => 'MobileNo Not Found', 'type' => 2];
+        }
+        return $this->commonService->sendResponse($result, true);
+    }
+    public function makeAsPrimaryMobileOtpValidate($datas)
+    {
+
+        $otpValidate = $this->OtpValidateSecondaryMobileNo($datas);
+        $datas = (object) $datas;
+        if ($otpValidate == 1) {
+            $perviousMobileNo = $this->personInterface->getPerviousPrimaryMobileNo($datas->personUid);
+            $setprimaryMobileNo = $this->personInterface->setPirmaryMobileNo($datas);
+            $message = ['status' => 'primary changed Successfully', 'type' => 1];
+        } else {
+            $message = ['status' => 'OTP Validation Failed ', 'type' => 2];
+        }
+
+        return $this->commonService->sendResponse($message, true);
+    }
+    public function OtpValidateSecondaryMobileNo($datas)
+    {
+        $datas = (object) $datas;
+        $checkMobile = $this->personInterface->getSecondaryMobileNoByUid($datas->mobileNo, $datas->personUid);
+        if ($checkMobile->otp_received == $datas->otp) {
+            $result = $this->personInterface->setStatusForMobileNo($checkMobile->uid, $checkMobile->mobile_no);
+        } else {
+            $result = ['message' => 'Failed', 'status' => 'OTP validation Failed'];
+        }
+        return $result;
+    }
+    public function addSecondaryEmail($datas)
+    {
+        $datas = (object) $datas;
+        $checkPrimaryEmail = $this->personInterface->checkPersonByEmail($datas->email);
+        $checkEmail = $this->personInterface->checkSecondaryEmailByUid($datas->email, $datas->personUid);
+        if (empty($checkPrimaryEmail) && empty($checkEmail)) {
+            $convertEmail = $this->convertSecondaryEmail($datas);
+            $result = $this->personInterface->addSecondaryEmailForMember($convertEmail);
+        } else {
+            $result = $checkPrimaryEmail
+            ? ['Member' => 'Email  Exists in Other Member', 'type' => 1]
+            : ['Member' => 'Email Exists', 'type' => 2];
+        }
+        return $this->commonService->sendResponse($result, true);
+    }
+    public function convertSecondaryEmail($datas)
+    {
+        $model = new PersonEmail();
+        $model->uid = $datas->personUid;
+        $model->email = $datas->email;
+        $model->otp_received = $this->sendingOtp();
+        $model->email_cachet_id = isset($datas->cachetId) ? $datas->cachetId : null;
+        $model->pfm_active_status_id = isset($datas->activeStatusId) ? $datas->activeStatusId : 2;
+
+        return $model;
+    }
+    public function sendingOtp()
+    {
+        return random_int(1000, 9999);
+
+    }
+    public function resendOtpForEmail($datas)
+    {
+        $datas = (object) $datas;
+        $model = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->uid);
+        if ($model) {
+            $otp = $this->sendingOtp();
+            $setOtpEmail = $this->personInterface->setOtpForPersonPrimaryEmail($datas->uid, $datas->email, $otp);
+            $data = ['Message' => ' Resend OTP Successfully', 'type' => 1];
+        } else {
+            $data = ['Message' => 'Email Not Found', 'type' => 2];
+        }
+        return $this->commonService->sendResponse($data, true);
+    }
+    public function deleteForEmailByUid($datas)
+    {
+        $datas = (object) $datas;
+        $model = $this->personInterface->deletedPersonEmailByUid($datas->email, $datas->uid);
+        if ($model) {
+            $result = ['Message' => 'Email are Deleted', 'type' => 1];
+        } else {
+            $result = ['Message' => 'Email Not Found', 'type' => 2];
+        }
+        return $this->commonService->sendResponse($model, true);
+    }
+    public function makeAsPrimaryEmailOtpValidate($datas)
+    {
+        $otpValidate = $this->OtpValidateForSecondaryEmail($datas);
+        $datas = (object) $datas;
+        if ($otpValidate == 1) {
+            $perviousEmail = $this->personInterface->getPerviousPrimaryEmail($datas->personUid);
+            $setprimaryEmail = $this->personInterface->setPirmaryEmail($datas);
+            $result = ['status' => 'primary changed Successfully', 'type' => 1];
+        } else {
+            $result = ['status' => 'OTP Validation Failed ', 'type' => 2];
+        }
+
+        return $this->commonService->sendResponse($result, true);
+
+    }
+    public function OtpValidateForSecondaryEmail($datas)
+    {
+        $datas = (object) $datas;
+        $checkEmail = $this->personInterface->getSecondaryEmailByUid($datas->email, $datas->personUid);
+        if ($checkEmail->otp_received == $datas->otp) {
+            $result = $this->personInterface->personEmailStatusUpdate($checkEmail->uid, $checkEmail->email);
+        } else {
+            $result = ['message' => 'Failed', 'status' => 'OTP validation Failed'];
+        }
+        return $result;
+    }
+    public function resendOtpForSecondaryMobile($datas)
+    {
+        $datas = (object) $datas;
+        $otp = $this->sendingOtp();
+        $resendOtp = $this->personInterface->setOtpMobileNo($datas->uid, $datas->number, $otp);
+        if ($resendOtp) {
+            $result = ['Message' => 'Resend Otp Succesfully', 'type' => 1];
+        } else {
+            $result = ['Message' => 'Resend  Failed', 'type' => 2];
+        }
+        return $this->commonService->sendResponse($result, true);
+    }
+    public function resendOtpForSecondaryEmail($datas)
+    {
+        $datas = (object) $datas;
+        $otp = $this->sendingOtp();
+        $resendOtpSecondaryEmail = $this->personInterface->setOtpForPersonPrimaryEmail($datas->personUid, $datas->email, $otp);
+        if ($resendOtp) {
+            $result = ['Message' => 'Resend Otp Succesfully', 'type' => 1];
+        } else {
+            $result = ['Message' => 'Resend  Failed', 'type' => 2];
+        }
+        return $this->commonService->sendResponse($result, true);
+    }
+    public function otpValidationForMobile($datas)
+    {
+
+        $datas = (object) $datas;
+        $checkMobile = $this->personInterface->getMobileNoByUid($datas->mobileNo, $datas->personUid);
+        if ($checkMobile->otp_received == $datas->otp) {
+            $result = $this->personInterface->setStatusForMobileNo($checkMobile->uid, $checkMobile->mobile_no);
+        } else {
+            $result = ['message' => 'Failed', 'status' => 'OTP validation Failed'];
+        }
+        return $result;
+    }
 }

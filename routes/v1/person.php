@@ -18,5 +18,6 @@ Route::post('personDatas',[PersonController::class,'personDatas'])->name('person
 Route::post('personUpdate',[PersonController::class,'personUpdate'])->name('personUpdate');
 Route::post('personToMember',[PersonController::class,'personToMember'])->name('personToMember');
 Route::post('emailOtpValidation',[PersonController::class,'emailOtpValidation'])->name('emailOtpValidation');
+Route::post('personProfiles',[PersonController::class,'personProfiles'])->name('personProfiles');
 
 

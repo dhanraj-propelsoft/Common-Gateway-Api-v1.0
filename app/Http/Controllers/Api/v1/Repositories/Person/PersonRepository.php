@@ -3,16 +3,21 @@
 namespace App\Http\Controllers\Api\v1\Repositories\Person;
 
 use App\Http\Controllers\Api\v1\Interface\Person\PersonInterface;
-use App\Models\Member;
+use App\Models\Person;
+use App\Models\PersonAddress;
+use App\Models\personAnniversary;
 use App\Models\PersonDetails;
 use App\Models\PersonEmail;
+use App\Models\PersonLanguage;
 use App\Models\PersonMobile;
+use App\Models\PersonProfilePic;
+use App\Models\PropertyAddress;
+use App\Models\TempEmail;
+use App\Models\TempMobile;
+use App\Models\TempPerson;
+use App\Models\Member;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
-
 
 class PersonRepository implements PersonInterface
 {
@@ -66,6 +71,7 @@ class PersonRepository implements PersonInterface
     }
     public function checkPerivousAddressById($addressId, $uid)
     {
+
         $porpertyAddress = PropertyAddress::where('id', $addressId)->delete();
         $personAddress = PersonAddress::where(['uid' => $uid, 'com_property_address_id' => $addressId])->delete();
         return true;
@@ -230,13 +236,44 @@ class PersonRepository implements PersonInterface
             ];
         }
     }
-   public function personEmailStatusUpdate($uid,$email)
-   {
-    return PersonEmail::where(['uid' => $uid, 'email' => $email])->update(['email_validation_id' => 1, 'validation_updated_on' => Carbon::now()]);
+    public function personEmailStatusUpdate($uid, $email)
+    {
+        return PersonEmail::where(['uid' => $uid, 'email' => $email])->update(['email_validation_id' => 1, 'validation_updated_on' => Carbon::now()]);
 
-   }
-   public function setStageInMember($uid)
-   {
-       return Member::where('uid', $uid)->update(['pfm_stage_id' => 2]);
-   }
+    }
+    public function setStageInMember($uid)
+    {
+        return Member::where('uid', $uid)->update(['pfm_stage_id' => 2]);
+    }
+    public function getPersonPrimaryDataByUid($uid)
+    {
+
+        $model = Person::with('personDetails', 'email', 'mobile', 'profilePic', 'personLanguage', 'personAnniversaryDate')
+            ->whereHas('mobile', function ($query) {
+                $query->where('mobile_cachet_id', 1);
+            })
+            ->whereHas('email', function ($query) {
+                $query->where('email_cachet_id', 1);
+            })
+            ->where('uid', $uid)
+            ->first()->toArray();
+        return $model;
+
+    }
+    public function personAddressByuid($uid)
+    {
+
+        $model= PropertyAddress::with('ParentAddress')
+            ->where('uid', $uid)
+            ->get();
+
+    }
+    public function personSecondaryMobileByUid($uid)
+    {
+        return PersonMobile::where(['uid' => $uid, ['mobile_cachet_id', '=', '2']])->get();
+    }
+    public function personSecondaryEmailByUid($uid)
+    {
+        return PersonEmail::where(['uid' => $uid, ['email_cachet_id', '=', '2']])->get();
+    }
 }

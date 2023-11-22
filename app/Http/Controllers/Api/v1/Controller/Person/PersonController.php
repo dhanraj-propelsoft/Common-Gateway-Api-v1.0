@@ -110,4 +110,11 @@ class PersonController extends Controller
         Log::info('PersonController > emailOtpValidation function Return.' . json_encode($response));
         return $response;
     }
+    public function personProfiles(Request $request)
+    {
+        Log::info('PersonController > personProfiles function Inside.' . json_encode($request->all()));
+        $response = $this->personService->personProfileDetails($request->all());
+        Log::info('PersonController > personProfiles function Return.' . json_encode($response));
+        return $response;
+    }
 }

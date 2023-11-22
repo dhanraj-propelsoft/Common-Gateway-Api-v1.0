@@ -778,7 +778,6 @@ class PersonService
     }
     public function emailOtpValidation($datas)
     {
-        dd($datas);
         Log::info('PersonService > emailOtpValidation function Inside.' . json_encode($datas));
         $datas = (object) $datas;
         $uid = $datas->uid;
@@ -791,6 +790,26 @@ class PersonService
         } else {
             $result = ['status' => 'Otp Verified Failed', 'type' => 2, 'uid' => $uid];
         }
-        return $result;
+        return $this->commonService->sendResponse($result, true);
+    }
+    public function personProfileDetails($datas)
+    {
+
+        Log::info('PersonService > personProfileDetails function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $personDetails = $this->personInterface->getPersonPrimaryDataByUid($datas->uid);
+        $personAddressByUid = $this->personInterface->personAddressByUid($datas->uid);
+        $personMasterData = $this->commonService->getPersonMasterData();
+        $secondaryMobile = $this->personInterface->personSecondaryMobileByUid($datas->uid);
+        $secondaryEmail = $this->personInterface->personSecondaryEmailByUid($datas->uid);
+
+        Log::info('PersonService > personProfileDetails function Return.' . json_encode($personMasterData));
+        return [
+            'personDetail' => $personDetails,
+            'personAddressByUid' => $personAddressByUid,
+            'personMasterData' => $personMasterData,
+            'secondaryMobile' => $secondaryMobile,
+            'secondaryEmail'  =>$secondaryEmail
+        ];
     }
 }

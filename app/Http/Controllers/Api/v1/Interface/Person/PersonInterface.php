@@ -26,6 +26,13 @@ interface PersonInterface
     public function savePersonDatas($model);
     public function personEmailStatusUpdate($uid,$email);
     public function setStageInMember($uid);
+    public function getPersonPrimaryDataByUid($uid);
+    public function personAddressByuid($uid);
+    public  function personSecondaryMobileByUid($uid);
+    public  function personSecondaryEmailByUid($uid);
+
+
+
 
 
 

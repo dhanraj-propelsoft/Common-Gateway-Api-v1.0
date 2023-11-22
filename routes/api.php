@@ -15,3 +15,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 include_once('v1/person.php');
+include_once('v1/member.php');

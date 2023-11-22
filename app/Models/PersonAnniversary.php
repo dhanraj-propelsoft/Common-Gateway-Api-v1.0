@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PersonEmail extends Model
+class personAnniversary extends Model
 {
     use HasFactory;
-    protected $table = 'person_emails';
-    
+    protected $table = 'person_anniversarys';
     public function ParentPerson()
     {
         return $this->belongsTo(Person::class, 'uid', 'uid');

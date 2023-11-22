@@ -9,10 +9,14 @@ Route::post('findMobileNumber',[PersonController::class,'findMobileNumber'])->na
 Route::post('storePerson',[PersonController::class,'storePerson'])->name('storePerson');
 Route::get('getSalutation',[CommonController::class,'getSalutation'])->name('getSalutation');
 Route::post('storeTempPerson',[PersonController::class,'storeTempPerson'])->name('storeTempPerson');
-
 Route::post('personOtpValidation',[PersonController::class,'personOtpValidation'])->name('personOtpValidation');
-
-
-
+Route::post('generateEmailOtp',[PersonController::class,'generateEmailOtp'])->name('generateEmailOtp');
+Route::post('checkMemberOrPerson',[PersonController::class,'checkMemberOrPerson'])->name('checkMemberOrPerson');
+Route::post('checkPersonEmail',[PersonController::class,'checkPersonEmail'])->name('checkPersonEmail');
+Route::post('personMobileOtp',[PersonController::class,'personMobileOtp'])->name('personMobileOtp');
+Route::post('personDatas',[PersonController::class,'personDatas'])->name('personDatas');
+Route::post('personUpdate',[PersonController::class,'personUpdate'])->name('personUpdate');
+Route::post('personToMember',[PersonController::class,'personToMember'])->name('personToMember');
+Route::post('emailOtpValidation',[PersonController::class,'emailOtpValidation'])->name('emailOtpValidation');
 
 

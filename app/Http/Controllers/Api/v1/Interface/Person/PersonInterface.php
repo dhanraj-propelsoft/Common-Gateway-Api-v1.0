@@ -19,6 +19,17 @@ interface PersonInterface
     public function storePerson($allModels);
     public function storeTempPerson($model);
     public function findTempPersonById($id);
+    public function setOtpForPersonPrimaryEmail($uid,$email,$otp);
+    public function checkMemberByUid($uid);
+    public function setOtpMobileNo($uid,$mobile,$otp);
+    public function findEmailByPersonEmail($email);
+    public function savePersonDatas($model);
+    public function personEmailStatusUpdate($uid,$email);
+    public function setStageInMember($uid);
+
+
+
+
 
 
 

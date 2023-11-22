@@ -3,8 +3,16 @@
 namespace App\Http\Controllers\Api\v1\Repositories\Person;
 
 use App\Http\Controllers\Api\v1\Interface\Person\PersonInterface;
+use App\Models\Member;
+use App\Models\PersonDetails;
 use App\Models\PersonEmail;
 use App\Models\PersonMobile;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+
 
 class PersonRepository implements PersonInterface
 {
@@ -30,9 +38,9 @@ class PersonRepository implements PersonInterface
     {
         return PersonEmail::where(['uid' => $uid, ['email_cachet_id', '=', 1]])->whereNull('deleted_flag')->first();
     }
-    public function getPersonMobileNoByUid($uid,$mobile)
+    public function getPersonMobileNoByUid($uid, $mobile)
     {
-        return   PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->whereNull('deleted_flag')->first();
+        return PersonMobile::where(['uid' => $uid, 'mobile_no' => $mobile])->whereNull('deleted_flag')->first();
     }
     public function getPersonProfileByUid($uid)
     {
@@ -183,4 +191,52 @@ class PersonRepository implements PersonInterface
 
         return TempPerson::findOrFail($id);
     }
+    public function setOtpForPersonPrimaryEmail($uid, $email, $otp)
+    {
+        return PersonEmail::where(["uid" => $uid, 'email' => $email])->update(["otp_received" => $otp]);
+    }
+    public function checkMemberByUid($uid)
+    {
+        return Member::where('uid', $uid)->whereNull('deleted_at')->first();
+    }
+    public function setOtpMobileNo($uid, $mobile, $otp)
+    {
+        return PersonMobile::where(["uid" => $uid, 'mobile_no' => $mobile])->update(['otp_received' => $otp]);
+    }
+    public function findEmailByPersonEmail($email)
+    {
+        $model = PersonEmail::where('email', $email)->whereIn('email_cachet_id', [1, 2])->get();
+        return count($model) > 0 ? $model : null;
+    }
+    public function savePersonDatas($model)
+    {
+        try {
+            $result = DB::transaction(function () use ($model) {
+
+                $model->save();
+                return [
+                    'message' => "Success",
+                    'data' => $model,
+                ];
+            });
+
+            return $result;
+        } catch (\Exception $e) {
+
+            return [
+
+                'message' => "failed",
+                'data' => $e,
+            ];
+        }
+    }
+   public function personEmailStatusUpdate($uid,$email)
+   {
+    return PersonEmail::where(['uid' => $uid, 'email' => $email])->update(['email_validation_id' => 1, 'validation_updated_on' => Carbon::now()]);
+
+   }
+   public function setStageInMember($uid)
+   {
+       return Member::where('uid', $uid)->update(['pfm_stage_id' => 2]);
+   }
 }

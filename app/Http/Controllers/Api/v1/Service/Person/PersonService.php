@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api\v1\Service\Person;
 
+use App\Http\Controllers\Api\v1\Interface\Common\CommonInterface;
+use App\Http\Controllers\Api\v1\Interface\Common\SmsInterface;
 use App\Http\Controllers\Api\v1\Interface\Member\MemberInterface;
 use App\Http\Controllers\Api\v1\Interface\Person\PersonInterface;
 use App\Http\Controllers\Api\v1\Service\Common\CommonService;
-use Carbon\Carbon;
+use App\Http\Controllers\Api\v1\Service\Common\SmsService;
 use App\Models\Person;
 use App\Models\PersonAddress;
 use App\Models\personAnniversary;
@@ -15,21 +17,22 @@ use App\Models\PersonLanguage;
 use App\Models\PersonMobile;
 use App\Models\PersonProfilePic;
 use App\Models\PropertyAddress;
-use App\Models\TempEmail;
-use App\Models\TempMobile;
 use App\Models\TempPerson;
-use App\Models\Member;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
 class PersonService
 {
     protected $personInterface, $commonService;
-    public function __construct(PersonInterface $personInterface, CommonService $commonService, MemberInterface $memberInterface)
+    public function __construct(PersonInterface $personInterface, CommonService $commonService, MemberInterface $memberInterface, SmsService $smsService, SmsInterface $smsInterface, CommonInterface $CommonInterface)
     {
         $this->personInterface = $personInterface;
         $this->commonService = $commonService;
         $this->memberInterface = $memberInterface;
+        $this->smsService = $smsService;
+        $this->smsInterface = $smsInterface;
+        $this->CommonInterface = $CommonInterface;
 
     }
     public function findCredential($datas)
@@ -439,12 +442,12 @@ class PersonService
                 $model[$i] = new PersonProfession();
                 $model[$i]->department_id = $datas->ProfessionDepartment[$i];
                 $model[$i]->designation_id = $datas->Designation[$i];
-                $model[$i]->org_id = isset($datas->organization[$i])?$datas->organization[$i]:Null;
+                $model[$i]->org_id = isset($datas->organization[$i]) ? $datas->organization[$i] : null;
                 // $model[$i]->doj=$datas->joinDate[$i];
                 //  $model[$i]->dor=$datas->reliveDate[$i];
                 $model[$i]->experience = $datas->experinceYear[$i];
-                $model[$i]->reason = isset($datas->reason[$i])?$datas->reason[$i]:Null;
-                $model[$i]->pfm_active_status_id = isset($datas->activeStatusId[$i])?$datas->activeStatusId[$i]:Null;
+                $model[$i]->reason = isset($datas->reason[$i]) ? $datas->reason[$i] : null;
+                $model[$i]->pfm_active_status_id = isset($datas->activeStatusId[$i]) ? $datas->activeStatusId[$i] : null;
                 array_push($orgModel, $model[$i]);
             }
         }
@@ -513,7 +516,7 @@ class PersonService
 
         Log::info('PersonService > storeTempPerson function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $tempId = isset($datas->tempId) ? $datas->tempId : Null;
+        $tempId = isset($datas->tempId) ? $datas->tempId : null;
         $model = $this->convertToTempPersonModel($datas, $tempId);
         $storeTempPerson = $this->personInterface->storeTempPerson($model);
         Log::info('PersonService > storeTempPerson function Return.' . json_encode($storeTempPerson));
@@ -653,5 +656,141 @@ class PersonService
         } else {
             return $this->commonService->sendError(['InValid Person', false]);
         }
+    }
+    public function generateEmailOtp($datas)
+    {
+        Log::info('PersonService > generateEmailOtp function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $personData = $this->personInterface->getPersonEmailByUid($datas->uid);
+        $otp = substr(str_shuffle("123456789"), 0, 5);
+        $setOtpEmail = $this->personInterface->setOtpForPersonPrimaryEmail($datas->uid, $personData->email, $otp);
+        if ($setOtpEmail) {
+            $getMemberName = $this->personInterface->getPersonDatasByUid($datas->uid);
+            $response = ['type' => '1', 'uid' => $datas->uid, 'email' => $personData->email, 'personName' => $getMemberName['first_name']];
+            return $this->commonService->sendResponse($response, true);
+
+        } else {
+            $response = ["message" => 'Mail Not Send', 'type' => '2'];
+            return $this->commonService->sendError($response, false);
+        }
+    }
+    public function checkMemberOrPerson($datas)
+    {
+
+        Log::info('PersonService > checkMemberOrPerson function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $checkMember = $this->personInterface->checkMemberByUid($datas->uid);
+        if ($checkMember) {
+            $personName = $this->personInterface->getPersonDatasByUid($datas->uid);
+            return $this->commonService->sendResponse($personName, 'ExactMember');
+        } else {
+            $mobileOtp = $this->personMobileOtp($datas);
+            return $mobileOtp;
+        }
+    }
+    public function personMobileOtp($datas)
+    {
+        Log::info('PersonService > personMobileOtp function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $otp = random_int(1000, 9999);
+        $setOtpMobile = $this->personInterface->setOtpMobileNo($datas->uid, $datas->mobileNumber, $otp);
+        $smsTypeModel = $this->smsInterface->findSmsTypeByName('PersonToMember');
+        $smsHistoryModel = $this->smsService->storeSms($datas->mobileNumber, $smsTypeModel->id, $otp, $datas->uid);
+        Log::info('PersonService > personMobileOtp function Return.' . json_encode($datas));
+        return $this->commonService->sendResponse($datas, 'OtpSuccesfully');
+    }
+    public function checkPersonEmail($datas)
+    {
+
+        Log::info('PersonService > checkPersonEmail function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $checkEmailByUid = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->personUid);
+        $findEmailByPereson = $this->personInterface->findEmailByPersonEmail($datas->email);
+        Log::info('PersonService > checkPersonEmail function Return.' . json_encode($checkEmailByUid));
+        if ($checkEmailByUid) {
+            $result = ['type' => 1, 'personDatas' => $checkEmailByUid, 'mobileNumber' => $datas->mobileNumber, 'status' => "Email In User"];
+        } elseif ($findEmailByPereson) {
+            $result = ['type' => 2, 'personDatas' => $findEmailByPereson, 'status' => "mutiplePerson"];
+        } else {
+            $result = ['type' => 3, 'personDatas' => null, 'status' => "Email Not Found"];
+        }
+        return $this->commonService->sendResponse($result, true);
+    }
+    public function personDatas($datas)
+    {
+
+        Log::info('PersonService > personDatas function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $model = $this->personInterface->getPersonDatasByUid($datas->uid);
+        Log::info('PersonService > personDatas function Return.' . json_encode($model));
+        $salutation = $this->CommonInterface->getSalutation();
+        $result = ['personData' => $model, 'salutation' => $salutation];
+        return $this->commonService->sendResponse($result, true);
+    }
+    public function personUpdate($datas)
+    {
+
+        Log::info('PersonService > personUpdate function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $personData = $this->personInterface->getPersonDatasByUid($datas->uid);
+        $personUpdate = $this->updatePerson($personData, $datas);
+        $saveperson = $this->personInterface->savePersonDatas($personUpdate);
+        $gender = $this->CommonInterface->getAllGender();
+        $bloodGroup = $this->CommonInterface->getAllBloodGroup();
+        $result = ['gender' => $gender, 'bloodGroup' => $bloodGroup, 'personData' => $personData];
+        return $this->commonService->sendResponse($result, true);
+    }
+    public function updatePerson($personData, $datas)
+    {
+        Log::info('PersonService > updatePerson function Inside.' . json_encode($datas));
+        Log::info('PersonService > updatePerson function Inside.' . json_encode($personData));
+        if ($datas->uid) {
+            $personData->uid = isset($datas->uid) ? $datas->uid : null;
+            $personData->pims_person_salutation_id = isset($datas->salutation) ? $datas->salutation : null;
+            $personData->first_name = isset($datas->firstName) ? $datas->firstName : null;
+            $personData->middle_name = isset($datas->middleName) ? $datas->middleName : null;
+            $personData->last_name = isset($datas->lastName) ? $datas->lastName : null;
+            $personData->nick_name = isset($datas->nickName) ? $datas->nickName : null;
+            Log::info('PersonService > updatePerson function Return.' . json_encode($personData));
+            return $personData;
+        }
+    }
+    public function personToMember($datas)
+    {
+
+        Log::info('PersonService > personToMember function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $person = $this->personInterface->getPersonDatasByUid($datas->uid);
+        $convertPerson = $this->convertPerson($person, $datas);
+        $savePerson = $this->personInterface->savePersonDatas($convertPerson);
+        return $this->commonService->sendResponse($person, true);
+    }
+    public function convertPerson($person, $datas)
+    {
+        Log::info('PersonService > convertPerson function Inside.' . json_encode($datas));
+        Log::info('PersonService > convertPerson function Inside.' . json_encode($person));
+        $person->uid = isset($datas->uid) ? $datas->uid : null;
+        $person->dob = isset($datas->dob) ? $datas->dob : null;
+        $person->pims_person_gender_id = isset($datas->gender) ? $datas->gender : null;
+        $person->pims_person_blood_group_id = isset($datas->bloodGroup) ? $datas->bloodGroup : null;
+        Log::info('PersonService > convertPerson function Return.' . json_encode($person));
+        return $person;
+    }
+    public function emailOtpValidation($datas)
+    {
+        dd($datas);
+        Log::info('PersonService > emailOtpValidation function Inside.' . json_encode($datas));
+        $datas = (object) $datas;
+        $uid = $datas->uid;
+        $model = $this->personInterface->checkPersonEmailByUid($datas->email, $uid);
+        Log::info('PersonService > emailOtpValidation function Return.' . json_encode($model));
+        if ($model->otp_received == $datas->otp) {
+            $emailStatusUpdate = $this->personInterface->personEmailStatusUpdate($uid, $datas->email);
+            $setSatge = $this->personInterface->setStageInMember($uid);
+            $result = ['status' => 'Otp Verified', 'type' => 1, 'uid' => $uid];
+        } else {
+            $result = ['status' => 'Otp Verified Failed', 'type' => 2, 'uid' => $uid];
+        }
+        return $result;
     }
 }

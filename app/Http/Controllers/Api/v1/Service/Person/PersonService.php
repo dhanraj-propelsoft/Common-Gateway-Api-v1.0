@@ -43,10 +43,24 @@ class PersonService
     }
     public function findCredential($datas)
     {
-        $datas = (object) $datas;
-        $checkPersonMobile = $this->personInterface->checkPersonByMobileNo($datas->mobileNumber);
-        $result = ['type' => 3, 'status' => 'freshMember'];
-        return $this->commonService->sendResponse($result, true);
+            Log::info('PersonService > findCredential function Inside.' . json_encode($datas));
+            $datas = (object) $datas;
+            $checkPersonMobile = $this->personInterface->checkPersonByMobileNo($datas->mobileNumber);
+            if (!empty($checkPersonMobile)) {
+                $checkPersonEmail = $this->personInterface->checkPersonEmailByUid($datas->email, $checkPersonMobile->uid);
+            }
+            $personMobile = $this->personInterface->getPersonDataByMobileNo($datas->mobileNumber);
+            $personEmail = $this->personInterface->getPersonDataByEmail($datas->email);
+
+            if ($checkPersonMobile && $checkPersonEmail) {
+                $result = ['type' => 1, 'personData' => $datas, 'uid' => $checkPersonMobile->uid, 'status' => 'ExactPerson'];
+            } else if ($personMobile !== null || $personEmail!== null) {
+                $personData=['personMobile'=>$personMobile->mobile,'personEmail'=>$personEmail->email];
+                $result = ['type' => 2, 'personData' => $personData, 'status' => 'mappedPerson'];
+            } else {
+                $result = ['type' => 3, 'status' => 'freshMember'];
+            }
+            return $this->commonService->sendResponse($result,);
     }
     public function findMobileNumber($datas)
     {

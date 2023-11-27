@@ -700,12 +700,12 @@ class PersonService
 
         Log::info('PersonService > checkPersonEmail function Inside.' . json_encode($datas));
         $datas = (object) $datas;
-        $checkEmailByUid = $this->personInterface->checkPersonEmailByUid($datas->email, $datas->personUid);
-        $findEmailByPereson = $this->personInterface->findEmailByPersonEmail($datas->email);
+        $checkEmailByUid = $this->memberInterface->checkMemberEmailByUid($datas->email, $datas->personUid);
+        $findEmailByPerson = $this->personInterface->findEmailByPersonEmail($datas->email);
         Log::info('PersonService > checkPersonEmail function Return.' . json_encode($checkEmailByUid));
         if ($checkEmailByUid) {
             $result = ['type' => 1, 'personDatas' => $checkEmailByUid, 'mobileNumber' => $datas->mobileNumber, 'status' => "Email In User"];
-        } elseif ($findEmailByPereson) {
+        } elseif ($findEmailByPerson) {
             $result = ['type' => 2, 'personDatas' => $findEmailByPereson, 'status' => "mutiplePerson"];
         } else {
             $result = ['type' => 3, 'personDatas' => null, 'status' => "Email Not Found"];

@@ -45,6 +45,10 @@ class MemberRepository implements MemberInterface
     }
     public function findMemberByMobileNo($mobileNo)
     {
-       return Member::with('personDetails')->where('primary_mobile', $mobileNo)->whereNull('deleted_at')->first();
+       return Member::with('personDetails')->where('primary_mobile', $mobileNo)->whereNull('deleted_flag')->first();
+    }
+    public function checkMemberEmailByUid($email,$uid)
+    {
+       return Member::where(['uid'=>$uid,'primary_email'=>$email])->whereNull('deleted_flag')->first();
     }
 }

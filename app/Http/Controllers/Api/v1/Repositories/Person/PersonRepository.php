@@ -276,29 +276,44 @@ class PersonRepository implements PersonInterface
     }
     public function getPersonDataByEmail($email)
     {
-        return Person::with('email', 'existMember')
+        $data=  Person::with('email', 'existMember')
             ->whereHas('email', function ($query) use ($email) {
                 $query->whereIn('email_cachet_id', [1, 2])
                     ->where('email', $email);
             })
-            ->whereHas('existMember', function ($query) use ($email) {
-                $query->where('primary_email', '!=', $email);
-            })
             ->first();
+            if($data)
+            {
+                $email = $data['email']['email'];
+                $member=$this->CheckEmailInMember($email);
+                return $member ?  NULL :  $data;
+            }
 
+    }
+    public function CheckEmailInMember($email)
+    {
+        return Member::where('primary_email',$email)->whereNull('deleted_flag')->first();
     }
     public function getPersonDataByMobileNo($mobile)
     {
-        return Person::with('mobile', 'existMember')
+       
+        $data= Person::with('mobile', 'existMember')
             ->whereHas('mobile', function ($query) use ($mobile) {
                 $query->whereIn('mobile_cachet_id', [1, 2])
                     ->where('mobile_no', $mobile);
             })
-            ->whereHas('existMember', function ($query) use ($mobile) {
-                $query->where('primary_mobile', '!=', $mobile);
-            })
             ->first();
-
+            if($data)
+            {
+                $mobileNo = $data['mobile']['mobile_no'];
+                $member=$this->CheckMobileNoInMember($mobileNo);
+                return $member ?  NULL :  $data;
+            }
+           
+    }
+    public function CheckMobileNoInMember($mobileNo)
+    {
+        return Member::where('primary_mobile',$mobileNo)->whereNull('deleted_flag')->first();
     }
     public function getAllDatasInMember($uid)
     {

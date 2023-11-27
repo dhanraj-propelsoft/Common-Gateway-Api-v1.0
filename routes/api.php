@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\v1\Controller\Member\MemberController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 include_once('v1/person.php');
 include_once('v1/member.php');
+include_once('v1/commonApi.php');
+
+
+    Route::post('memberLogout', [MemberController::class, 'memberLogout'])->name('memberLogout');

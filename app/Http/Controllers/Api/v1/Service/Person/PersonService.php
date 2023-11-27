@@ -524,8 +524,8 @@ class PersonService
                 $salutationModel = $this->commonService->getSalutation();
                 $responseData = ['tempModel' => $storeTempPerson['data'], 'salutationModel' => $salutationModel];
             } else if ($responseModel->pfm_stage_id == 2) {
-                $gender = $this->commonService->getAllGender();
-                $bloodGroup = $this->commonService->getAllBloodGroup();
+                $gender = $this->CommonInterface->getAllGender();
+                $bloodGroup = $this->CommonInterface->getAllBloodGroup();
                 $responseData = ['tempModel' => $responseModel, 'gender' => $gender, 'bloodGroup' => $bloodGroup];
             } elseif ($responseModel->pfm_stage_id == 3) {
                 $temp = ['tempId' => $tempId];

@@ -161,7 +161,7 @@ class MemberService
         $saveMember = $this->MemberInterface->storeMember($createMember);
         $result = ['personName' => $getPersonName->first_name, 'mobileNumber' => $mobile->mobile_no];
         Log::info('MemberService > memberCreation function Return.' . json_encode($result));
-        return $this->commonService->sendResponse($result, '');
+        return $this->commonService->sendResponse($result,true);
     }
     public function memberCreate($mobile, $email, $datas)
     {
@@ -186,5 +186,30 @@ class MemberService
         $token->revoke();
         $result = ['type'=>1,'message' => ' Logged Out Successfully!'];
         return $this->commonService->sendResponse($result, '');
+    }
+    public function findMobileNumber($datas)
+    {
+
+        $datas = (object) $datas;
+        $model = $this->MemberInterface->findMemberByMobileNo($datas->mobileNumber);
+
+        if ($model) {
+            $memberName = $model->personDetails->first_name;
+            $memberUid = $model->personDetails->uid;
+            $memberSatge = $model->pfm_stage_id;
+
+            $result = [
+                'type' => 1,
+                'stage' => $memberSatge,
+                'memberName' => $memberName,
+                'memberUid' => $memberUid,
+                'mobileNumber' => $datas->mobileNumber,
+                'status' => "MemberOnly"];
+        } else {
+            $result = ['type' => 2,
+                'mobileNumber' => $datas->mobileNumber,
+                'status' => "checkingPerson"];
+        }
+        return $this->commonService->sendResponse($result, true);
     }
 }

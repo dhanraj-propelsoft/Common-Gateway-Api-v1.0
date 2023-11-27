@@ -9,9 +9,13 @@ class PersonMobile extends Model
 {
     use HasFactory;
     protected $table = 'person_mobiles';
-    
+
     public function ParentPerson()
     {
         return $this->belongsTo(Person::class, 'uid', 'uid');
+    }
+    public function existMember()
+    {
+        return $this->hasOne(Member::class,'uid','uid');
     }
 }

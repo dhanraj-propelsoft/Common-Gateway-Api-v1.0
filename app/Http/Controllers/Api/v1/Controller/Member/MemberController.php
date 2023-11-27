@@ -134,4 +134,11 @@ class MemberController extends Controller
         Log::info('MemberController > memberLogout function Return.' . json_encode($response));
         return $response;
     }
+    public function findMobileNumber(Request $request): JsonResponse
+    {
+        Log::info('MemberController > findMobileNumber function Inside.' . json_encode($request->all()));
+        $response = $this->MemberService->findMobileNumber($request->all());
+        Log::info('MemberController > findMobileNumber function Return.' . json_encode($response));
+        return $response;
+    }
 }

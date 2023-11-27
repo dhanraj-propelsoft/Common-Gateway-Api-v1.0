@@ -23,13 +23,7 @@ class PersonController extends Controller
         return $response;
     }
 
-    public function findMobileNumber(Request $request): JsonResponse
-    {
-        Log::info('PersonController > findMobileNumber function Inside.' . json_encode($request->all()));
-        $response = $this->personService->findMobileNumber($request->all());
-        Log::info('PersonController > findMobileNumber function Return.' . json_encode($response));
-        return $response;
-    }
+
     public function storePerson(Request $request): JsonResponse
     {
 

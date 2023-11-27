@@ -62,31 +62,7 @@ class PersonService
             }
             return $this->commonService->sendResponse($result,);
     }
-    public function findMobileNumber($datas)
-    {
 
-        $datas = (object) $datas;
-        $model = $this->memberInterface->findMemberByMobileNo($datas->mobileNumber);
-
-        if ($model) {
-            $memberName = $model->personDetails->first_name;
-            $memberUid = $model->personDetails->uid;
-            $memberSatge = $model->pfm_stage_id;
-
-            $result = [
-                'type' => 1,
-                'stage' => $memberSatge,
-                'memberName' => $memberName,
-                'memberUid' => $memberUid,
-                'mobileNumber' => $datas->mobileNumber,
-                'status' => "MemberOnly"];
-        } else {
-            $result = ['type' => 2,
-                'mobileNumber' => $datas->mobileNumber,
-                'status' => "checkingPerson"];
-        }
-        return $this->commonService->sendResponse($result, "");
-    }
     public function storePerson($datas, $type = null)
     {
 

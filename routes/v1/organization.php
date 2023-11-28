@@ -29,13 +29,40 @@ Route::get('organizationMasterDatas', function (Request $request) {
 
 
 //done
-Route::get('organizationMasterDatas', function (Request $request) {
+Route::post('getCityByDistrictId', function (Request $request) {
     // Get all data from the incoming request
     $requestData = $request->all();
     // Make a POST request to Project B with the request data
-    $response = Http::get(config('organization_api_base') . 'organizationMasterDatas', $requestData);
+    $response = Http::post(config('organization_api_base') . 'getCityByDistrictId', $requestData);
     return $response; // Output the response for debugging purposes
 });
+//done
+Route::post('getOrganizationAccountByUid', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+    $response = Http::post(config('organization_api_base') . 'getOrganizationAccountByUid', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+
+//done
+Route::post('setDefaultOrganization', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+    $response = Http::post(config('organization_api_base') . 'setDefaultOrganization', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+
+//done
+Route::get('organizationIndex', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+    $response = Http::get(config('organization_api_base') . 'organizationIndex', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+
 
 
 //

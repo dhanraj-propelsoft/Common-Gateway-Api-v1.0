@@ -18,6 +18,6 @@ use Illuminate\Support\Facades\Route;
 include_once('v1/person.php');
 include_once('v1/member.php');
 include_once('v1/commonApi.php');
-
+include_once('v1/organization.php');
 
     Route::post('memberLogout', [MemberController::class, 'memberLogout'])->name('memberLogout');

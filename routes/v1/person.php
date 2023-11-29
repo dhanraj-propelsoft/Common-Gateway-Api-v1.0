@@ -240,9 +240,41 @@ Route::post('otpValidationForMobile', function (Request $request) {
     // Get all data from the incoming request
     $requestData = $request->all();
     // Make a POST request to Project B with the request data
-    $response = Http::post(config('person_api_base') . 'otpValidationForMobile', $requestData);
+        $response = Http::post(config('person_api_base') . 'otpValidationForMobile', $requestData);
     return $response; // Output the response for debugging purposes
 });
+//done
+Route::post('findExactPersonWithEmailAndMobile', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+        $response = Http::post(config('person_api_base') . 'findExactPersonWithEmailAndMobile', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+//done
+Route::post('findMemberDataByUid', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+        $response = Http::post(config('person_api_base') . 'findMemberDataByUid', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+//done
+Route::post('getPrimaryMobileAndEmailbyUid', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+        $response = Http::post(config('person_api_base') . 'getPrimaryMobileAndEmailbyUid', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+Route::post('personProfileDatas', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+        $response = Http::post(config('person_api_base') . 'personProfileDatas', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+
 // Route::post('storeTempPerson', [PersonController::class, 'storeTempPerson'])->name('storeTempPerson');
 // Route::post('personOtpValidation', [PersonController::class, 'personOtpValidation'])->name('personOtpValidation');
 // Route::post('generateEmailOtp', [PersonController::class, 'generateEmailOtp'])->name('generateEmailOtp');

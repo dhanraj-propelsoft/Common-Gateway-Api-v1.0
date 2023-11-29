@@ -63,7 +63,13 @@ Route::get('organizationIndex', function (Request $request) {
     return $response; // Output the response for debugging purposes
 });
 
-
+Route::post('getDistrictByStateId', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+    $response = Http::post(config('organization_api_base') . 'getDistrictByStateId', $requestData);
+    return $response; // Output the response for debugging purposes
+});
 
 //
 

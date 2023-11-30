@@ -14,10 +14,14 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::middleware('auth:api')
 
+    ->group(function () {
 include_once('v1/person.php');
-include_once('v1/member.php');
 include_once('v1/commonApi.php');
 include_once('v1/organization.php');
+include_once('v1/member.php');
+});
+Route::post('memberLogin', [MemberController::class,'memberLogin'])->name('memberLogin');
 
-    Route::post('memberLogout', [MemberController::class, 'memberLogout'])->name('memberLogout');
+

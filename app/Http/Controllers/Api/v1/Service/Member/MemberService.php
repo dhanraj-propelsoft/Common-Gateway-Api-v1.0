@@ -185,7 +185,7 @@ class MemberService
         $token = auth()->user()->token();
         $token->revoke();
         $result = ['type'=>1,'message' => ' Logged Out Successfully!'];
-        return $this->commonService->sendResponse($result, '');
+        return $this->commonService->sendResponse($result,true);
     }
     public function findMobileNumber($datas)
     {

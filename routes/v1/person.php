@@ -49,7 +49,7 @@ Route::post('findCredential', function (Request $request) {
     $response = Http::post(config('person_api_base') . 'findCredential', $requestData);
     return $response; // Output the response for debugging purposes
 });
-//done 
+//done
 Route::post('storePerson', function (Request $request) {
     // Get all data from the incoming request
     $requestData = $request->all();
@@ -272,6 +272,60 @@ Route::post('personProfileDatas', function (Request $request) {
     $requestData = $request->all();
     // Make a POST request to Project B with the request data
         $response = Http::post(config('person_api_base') . 'personProfileDatas', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+//done
+Route::get('getPersonMasterData', function (Request $request) {
+    // Get all data from the incoming request
+
+    // Make a POST request to Project B with the request data
+        $response = Http::get(config('person_api_base') . 'getPersonMasterData');
+    return $response; // Output the response for debugging purposes
+});
+//done
+Route::post('getPersonMobileNoByUid', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+        $response = Http::post(config('person_api_base') . 'getPersonMobileNoByUid', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+Route::post('getPersonPrimaryDataByUid', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+        $response = Http::post(config('person_api_base') . 'getPersonPrimaryDataByUid', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+Route::post('personMotherTongueByUid', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+        $response = Http::post(config('person_api_base') . 'personMotherTongueByUid', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+//done
+Route::post('personGetAnniversaryDate', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+        $response = Http::post(config('person_api_base') . 'personGetAnniversaryDate', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+//done
+Route::post('personAddressByUid', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+        $response = Http::post(config('person_api_base') . 'personAddressByUid', $requestData);
+    return $response; // Output the response for debugging purposes
+});
+//done
+Route::post('getPersonEmailByUidAndEmail', function (Request $request) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+    // Make a POST request to Project B with the request data
+        $response = Http::post(config('person_api_base') . 'getPersonEmailByUidAndEmail', $requestData);
     return $response; // Output the response for debugging purposes
 });
 

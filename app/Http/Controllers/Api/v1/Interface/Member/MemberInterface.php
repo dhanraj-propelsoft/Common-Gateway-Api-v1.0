@@ -10,4 +10,6 @@ interface MemberInterface
     public Function storeMember($model);
     public function findMemberDataByUid($uid);
     public function verifyMemberForMobile($data);
+
+    public function getPerviousDefaultOrganization($uid);
 }

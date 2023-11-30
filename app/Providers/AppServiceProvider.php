@@ -32,5 +32,6 @@ class AppServiceProvider extends ServiceProvider
     {
         config(['person_api_base' => "http://127.0.0.1:8001/api/"]);
         config(['organization_api_base' => "http://127.0.0.1:8002/api/"]);
+        config(['hrm_api_base' => "http://127.0.0.1:8003/api/"]);
     }
 }

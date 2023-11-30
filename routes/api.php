@@ -21,7 +21,9 @@ include_once('v1/person.php');
 include_once('v1/commonApi.php');
 include_once('v1/organization.php');
 include_once('v1/member.php');
+include_once('v1/hrm.php');
 });
 Route::post('memberLogin', [MemberController::class,'memberLogin'])->name('memberLogin');
+
 
 

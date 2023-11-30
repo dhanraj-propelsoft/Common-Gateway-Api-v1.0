@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class MemberService
 {
+    protected  $MemberInterface,$personInterface,$commonService;
     public function __construct(MemberInterface $MemberInterface, PersonInterface $personInterface, CommonService $commonService)
     {
         $this->MemberInterface = $MemberInterface;
@@ -137,7 +138,10 @@ class MemberService
 
                 $personStatus = $this->personInterface->checkPersonExistence($uid);
                 $personType = $personStatus ? $personStatus->existence : null;
-                $response = ['type' =>1, 'personType' => $personType, 'token' => $token, 'uid' => $uid,'nickName' => $nickName, 'firstName' => $firstName, 'personPic' => $personPic];
+
+                $defaultOrg = $this->MemberInterface->getPerviousDefaultOrganization($uid);
+
+                $response = ['type' =>1, 'personType' => $personType, 'token' => $token, 'uid' => $uid, 'defaultOrg' => $defaultOrg, 'nickName' => $nickName, 'firstName' => $firstName, 'personPic' => $personPic];
                 return $this->commonService->sendResponse($response, "Login Successfully");
             } else {
                 $response = ['type' =>2, 'firstName' => $firstName, 'uid' => $uid];

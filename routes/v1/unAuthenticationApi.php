@@ -14,6 +14,8 @@ Route::post('passwordUpdateForMember', [MemberController::class,'passwordUpdateF
 Route::post('findMobileNumber',[MemberController::class,'findMobileNumber'])->name('findMobileNumber');
 Route::post('memberCreation', [MemberController::class,'memberCreation'])->name('memberCreation');
 
+Route::get('findMemberByUid/{uid}', [MemberController::class,'findMemberByUid'])->name('findMemberByUid');
+
 
 
 Route::post('storeTempPerson', function (Request $request) {

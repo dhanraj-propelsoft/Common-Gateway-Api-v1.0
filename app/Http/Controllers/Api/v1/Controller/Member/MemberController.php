@@ -141,4 +141,12 @@ class MemberController extends Controller
         Log::info('MemberController > findMobileNumber function Return.' . json_encode($response));
         return $response;
     }
+
+    public function findMemberByUid($uid)
+    {
+        Log::info('MemberController > findMobileNumber function Inside.' . json_encode($uid));
+        $response = $this->MemberService->findMemberByUid($uid);
+        Log::info('MemberController > findMobileNumber function Return.' . json_encode($response));
+        return $response;
+    }
 }

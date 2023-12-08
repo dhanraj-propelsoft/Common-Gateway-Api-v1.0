@@ -191,6 +191,11 @@ class MemberService
         $result = ['type'=>1,'message' => ' Logged Out Successfully!'];
         return $this->commonService->sendResponse($result,true);
     }
+    public function findMemberByUid($uid)
+    {
+        $model = $this->MemberInterface->findMemberDataByUid($uid);
+        return $this->commonService->sendResponse($model,true);
+    }
     public function findMobileNumber($datas)
     {
 

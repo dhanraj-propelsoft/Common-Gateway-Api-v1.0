@@ -26,11 +26,11 @@ Route::post('storeTempPerson', function (Request $request) {
     return $response; // Output the response for debugging purposes
 });
 
-Route::post('personOtpValidation', function (Request $request) {
+Route::post('tempPersonOtpValidate', function (Request $request) {
     // Get all data from the incoming request
     $requestData = $request->all();
     // Make a POST request to Project B with the request data
-    $response = Http::post(config('person_api_base') . 'personOtpValidation', $requestData);
+    $response = Http::post(config('person_api_base') . 'tempPersonOtpValidate', $requestData);
     return $response; // Output the response for debugging purposes
 });
 Route::post('generateEmailOtp', function (Request $request) {
@@ -196,3 +196,17 @@ Route::post('memberAllDetails', function (Request $request) {
     $response = Http::post(config('person_api_base') . 'memberAllDetails', $requestData);
     return $response; // Output the response for debugging purposes
 });
+Route::get('resendOtpForTempPerson/{tempId}', function (Request $request, $tempId) {
+    // Get all data from the incoming request
+    $requestData = $request->all();
+
+    // Make a POST request to Project B with the request data and orgId in the URL
+    $apiUrl = config('person_api_base') . "resendOtpForTempPerson/{$tempId}";
+    $response = Http::get($apiUrl, $requestData);
+    
+    // Output the response for debugging purposes
+ 
+    
+    return $response;
+});
+
